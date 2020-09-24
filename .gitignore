@@ -1,0 +1,23 @@
+# Object files
+*.o
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+*.dSYM
+
+file_disemvowel/file_disemvowel
+summarize_tree/summarize_tree
+summarize_tree/summarize_tree_ftw
