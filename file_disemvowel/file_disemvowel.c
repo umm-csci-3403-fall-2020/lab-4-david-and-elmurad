@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #define BUF_SIZE 1024
-
+#include <string.h>
 
 
 /*
@@ -66,10 +66,11 @@ void disemvowel(FILE* inputFile, FILE* outputFile) {
   char *outputBuffer = (char*) calloc(BUF_SIZE,sizeof(char));
   //bytesRead is numchars and buffer is in_buf, num is number of nonvowels
   while((bytesRead = fread(buffer,sizeof(char),BUF_SIZE,inputFile)) > 0){
-    int count = copy_non_vowels(bytesRead,buffer,outputBuffer);
-    fwrite(outputBuffer,sizeof(char),count, outputFile);
+    copy_non_vowels(bytesRead,buffer,outputBuffer);
+    fwrite(outputBuffer,sizeof(char),strlen(outputBuffer), outputFile);
   }
-  //fread(buffer, sizeof(char), BUF_SIZE, inputFile);
+  free(buffer);
+  free(outputBuffer);
 }
 
 int main(int argc, char *argv[]) {
@@ -78,11 +79,25 @@ int main(int argc, char *argv[]) {
     // provides files names as command line arguments.
     FILE *inputFile = stdin;
     FILE *outputFile = stdout;
+    bool givenFile = false;
+
+    if(argc > 1){
+      inputFile = fopen(argv[1], "r");
+    }
+    if(argc == 3){
+      outputFile = fopen(argv[2], "w+");
+      givenFile = true;
+    }
 
     // Code that processes the command line arguments
     // and sets up inputFile and outputFile.
 
     disemvowel(inputFile, outputFile);
+
+    if(givenFile){
+      fclose(inputFile);
+      fclose(outputFile);
+    }
 
     return 0;
 }
