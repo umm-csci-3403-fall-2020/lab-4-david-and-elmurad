@@ -16,9 +16,19 @@ bool is_dir(const char* path) {
    * return value from stat in case there is a problem, e.g., maybe the
    * the file doesn't actually exist.
    */
+  struct stat *nstat = malloc(sizeof(struct stat));
+  if(stat(path, nstat)) {
+    free(nstat);
+    return false;
+  } else {
+    bool is_dir = S_ISDIR(nstat->st_mode);
+    free(nstat);
+    return is_dir;
+  }
+  
 }
 
-/* 
+/*
  * I needed this because the multiple recursion means there's no way to
  * order them so that the definitions all precede the cause.
  */
@@ -36,12 +46,25 @@ void process_directory(const char* path) {
    * with a matching call to chdir() to move back out of it when you're
    * done.
    */
+  num_dirs++;
+  chdir(path);
+  DIR *dir = opendir(".");
+  struct dirent *de;
+
+  while ((de = readdir(dir)) != NULL) {
+    if(strcmp(de->d_name,".") && strcmp(de->d_name,"..")) {
+      process_path(de->d_name);
+    }
+  }
+
+  closedir(dir);
+  free(de);
+  chdir("..");
 }
 
 void process_file(const char* path) {
-  /*
-   * Update the number of regular files.
-   */
+
+  num_regular++;
 }
 
 void process_path(const char* path) {
@@ -53,7 +76,6 @@ void process_path(const char* path) {
 }
 
 int main (int argc, char *argv[]) {
-  // Ensure an argument was provided.
   if (argc != 2) {
     printf ("Usage: %s <path>\n", argv[0]);
     printf ("       where <path> is the file or root of the tree you want to summarize.\n");
